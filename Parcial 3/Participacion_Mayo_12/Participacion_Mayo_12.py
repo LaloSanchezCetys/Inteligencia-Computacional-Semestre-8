@@ -2,7 +2,7 @@ from openai import OpenAI
 import os
 from dotenv import load_dotenv
 
-SYSTEM_MESSAGE = "You are a chatbot. You will have a conversation with a user. Be friendly and concise"
+SYSTEM_MESSAGE = "Responde en Español a menos que el usuario te hable en otro idioma. Usa respuestas cortas. Usa un tono muy amigable."
 
 if __name__ == "__main__":
     load_dotenv()
@@ -17,13 +17,21 @@ if __name__ == "__main__":
 
     print(f"Chatting with {MODEL} model at {URL}\n")
 
+    messages_list = []
+    messages_list.append({'role': 'system', 'content': SYSTEM_MESSAGE})
+
     while True:
-        message = input("> ")
+        user_message = input("> ")
+
+        messages_list.append({'role': 'user', 'content': user_message})
+
         response = client.chat.completions.create(
             model=MODEL,
-            messages=[
-                {'role': 'system', 'content': SYSTEM_MESSAGE},
-                {'role': 'user', 'content': message},
-            ]
+            messages=messages_list
         )
-        print(response.choices[0].message.content)
+
+        assistant_text = response.choices[0].message.content
+
+        messages_list.append({"role": "assistant", "content": assistant_text})
+
+        print(assistant_text)
